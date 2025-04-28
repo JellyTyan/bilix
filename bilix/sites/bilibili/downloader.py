@@ -4,6 +4,7 @@ import re
 from pathlib import Path
 from typing import Union, Sequence, Tuple, List
 import aiofiles
+from aiofiles import os as aios
 import httpx
 from datetime import datetime, timedelta
 from . import api
@@ -388,7 +389,8 @@ class DownloaderBilibili(BaseDownloaderPart):
                                                                   seg_range=a[0].segment_base['index_range'],
                                                                   get_s=fut,
                                                                   task_id=task_id))
-
+                if await aios.path.exists(path / f'{media_name}.mp4'):
+                    return path / f'{media_name}.mp4'
             elif video_info.other:
                 self.logger.warning(
                     f"{task_name} 未解析到dash资源，转入durl mp4/flv下载（不需要会员的电影/番剧预览，不支持dash的视频）")
@@ -412,6 +414,8 @@ class DownloaderBilibili(BaseDownloaderPart):
                             f = f'{media_name}-{i}.{m.suffix}'
                             media_cors.append(_get_file(m, path / f))
                         await self.progress.update(task_id=task_id, upper=ffmpeg.concat)
+                if await aios.path.exists(path / f'{media_name}.mp4'):
+                    return path / f'{media_name}.mp4'
             else:
                 self.logger.warning(f'{task_name} 需要大会员或该地区不支持')
             # additional task
