@@ -441,6 +441,9 @@ class DownloaderBilibili(BaseDownloaderPart):
             self.logger.info(f'[cyan]已完成[/cyan] {media_path.name}')
         await self.progress.update(task_id, visible=False)
 
+        if await aios.path.exists(media_path):
+            return media_path
+
     @staticmethod
     def _dm2ass_factory(width: int, height: int):
         async def dm2ass(protobuf_bytes: bytes) -> bytes:
